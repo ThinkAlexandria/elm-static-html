@@ -1,17 +1,17 @@
 {
-  "name": "elm-static-html",
-  "version": "1.3.2",
+  "name": "static-html-from-elm",
+  "version": "1.0.1",
   "description": "Turn your Elm app into a static HTML site",
   "main": "index.js",
   "bin": {
-    "elm-static-html": "index.js"
+    "static-html-from-elm": "index.js"
   },
   "scripts": {
     "test": "./run_tests.sh"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eeue56/elm-static-html.git"
+    "url": "git+https://github.com/ThinkAlexandria/elm-static-html.git"
   },
   "keywords": [
     "elm",
@@ -21,14 +21,14 @@
     "side",
     "render"
   ],
-  "author": "eeue56",
+  "author": "YetAnotherMinion <npmjs@thinkalexandria.com>",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/eeue56/elm-static-html/issues"
+    "url": "https://github.com/ThinkAlexandria/elm-static-html/issues"
   },
-  "homepage": "https://github.com/eeue56/elm-static-html#readme",
+  "homepage": "https://github.com/ThinkAlexandria/elm-static-html#readme",
   "dependencies": {
-    "node-elm-compiler": "^4.2.0",
+    "node-elm-compiler": "^5.0",
     "yargs": "^6.4.0"
   }
 }

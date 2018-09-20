@@ -1,4 +1,8 @@
-# elm-static-html
+## Fork Notice
+
+This is a fork of https://github.com/eeue56/elm-static-html that provides Elm 0.19 support. The binary has been renamed to `static-html-from-elm`. It is 100% backwards compatibile with your old `elm-static-html` configuration.
+
+# static-html-from-elm
 
 
 Turn an Elm app into a static HTML site.
@@ -27,7 +31,7 @@ then you can use
 
 ```bash
 
-elm-static-html --filename Main.elm --output index.html
+static-html-from-elm --filename Main.elm --output index.html
 
 ```
 
@@ -40,10 +44,10 @@ which will produce
 
 ## Flags
 
-`elm-static-html -f Main.elm` will print the output to stdout by default
-You can create an initial config file through `elm-static-html --init-config`, though it's not needed to work.
+`static-html-from-elm -f Main.elm` will print the output to stdout by default
+You can create an initial config file through `static-html-from-elm --init-config`, though it's not needed to work.
 
-You can use the config file to generate multiple files through `elm-static-html -c elm-static-html.json`.
+You can use the config file to generate multiple files through `static-html-from-elm -c elm-static-html.json`.
 The config file looks like this:
 
 ```js

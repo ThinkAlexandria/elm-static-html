@@ -40,26 +40,27 @@ import Html exposing (Html)
 import ElmHtml.InternalTypes exposing (decodeElmHtml)
 import ElmHtml.ToString exposing (nodeToStringWithOptions, defaultFormatOptions)
 import Json.Decode as Json
-import Native.Jsonify
 
 ${imports}
 
 
 asJsonString : Html msg -> String
-asJsonString = Native.Jsonify.stringify
+asJsonString x = "REPLACE_ME_WITH_JSON_STRINGIFY"
 
 options = { defaultFormatOptions | newLines = True, indent = 4 }
 
 decode : (String, Html msg) -> ( String, String )
 decode (output, view) =
-    case Json.decodeString decodeElmHtml (asJsonString view) of
-        Err str -> (output, str)
+    case Json.decodeString (decodeElmHtml (\\_ \_ -> Json.succeed ())) (asJsonString view) of
+        Err err -> (output, Json.errorToString err)
         Ok str -> (output, nodeToStringWithOptions options str)
 
-main = Platform.program
+main = Platform.worker
     { init =
-        ( ()
-        , htmlOut ( List.map (decode ) [ ${views} ] )
+        (\\ () ->
+            ( ()
+            , htmlOut ( List.map (decode ) [ ${views} ] )
+            )
         )
     , update = (\\_ b -> (b, Cmd.none))
     , subscriptions = (\\_ -> Sub.none)

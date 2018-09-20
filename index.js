@@ -150,31 +150,30 @@ const moduleNames = getModuleNames(config);
 // fix an elm package file so that it will work with our project
 // and install our deps
 var fixElmPackage = function(workingDir, elmPackage){
-    elmPackage['native-modules'] = true;
+    //elmPackage['native-modules'] = true;
     var sources = elmPackage['source-directories'].map(function(dir){
         return path.join(workingDir, dir);
     });
     sources.push('.');
 
     elmPackage['source-directories'] = sources;
-    elmPackage['dependencies']["eeue56/elm-html-in-elm"] = "2.0.0 <= v < 3.0.0";
+    elmPackage['dependencies']['direct']['ThinkAlexandria/elm-html-in-elm'] = '1.0.1';
 
     return elmPackage;
 };
 
 var elmPackage = null;
 
-// try to load elm-package.json
+// try to load elm.json
 try {
-    elmPackage = require(path.join(process.cwd(), 'elm-package.json'));
+    elmPackage = require(path.join(process.cwd(), 'elm.json'));
 } catch (e){
-    console.error('Failed to load elm-package.json!');
-    console.error('Make sure elm-package.json is in the current dir');
+    console.error('Failed to load elm.json!');
+    console.error('Make sure elm.json is in the current dir');
     return -1;
 }
 
-// grab the user/project string from the elm-package file
-var projectName = elmPackage['repository'].replace('https://github.com/', '').replace('.git', '').replace('/', '$');
+// grab the user/project string from the elm.json file
 elmPackage = fixElmPackage(process.cwd(), elmPackage);
 var dirPath = path.join(process.cwd(), renderDirName);
 
@@ -186,7 +185,7 @@ try{
     // ignore this and try to continue anyway
 }
 
-var elmPackagePath = path.join(dirPath, 'elm-package.json');
+var elmPackagePath = path.join(dirPath, 'elm.json');
 var privateMainPath = path.join(dirPath, 'PrivateMain.elm');
 var nativePath = path.join(dirPath, 'Native/Jsonify.js');
 
@@ -196,15 +195,15 @@ fs.writeFileSync(elmPackagePath, JSON.stringify(elmPackage));
 var rendererFileContents = templates.generateRendererFile(moduleNames);
 fs.writeFileSync(privateMainPath, rendererFileContents);
 
-var nativeString = templates.generateNativeModuleString(projectName);
-fs.writeFileSync(nativePath, nativeString);
+// TODO replace the native file with a find and replace on the generated js
+//var nativeString = templates.generateNativeModuleString(projectName);
+//fs.writeFileSync(nativePath, nativeString);
 
 if (isVerbose) console.log('wrote template files to..', renderDirName);
 
 var options = {
-    yes: true,
     cwd: dirPath,
-    output: 'elm.js'
+    output: 'emitter.js'
 };
 
 
@@ -215,12 +214,19 @@ compileProcess.on('exit',
     function(exitCode){
         if (exitCode !== 0){
             console.log("Exited with the code", exitCode);
-            console.log('Trying to proceed anyway..');
+            return;
+            //console.log('Trying to proceed anyway..');
         }
+        var emitterFile = path.join(dirPath, 'emitter.js');
+        // Find and replace
+        var emitterFileContents = fs.readFileSync(emitterFile, 'utf-8');
+        var fixedEmitterContents = emitterFileContents.replace(/'REPLACE_ME_WITH_JSON_STRINGIFY'/g, 'JSON.stringify(x)');
+        fs.writeFileSync(emitterFile, fixedEmitterContents);
+        
 
-        var Elm = require(path.join(dirPath, 'elm.js'));
-        var elmApp = Elm.PrivateMain.worker();
-        elmApp.ports.htmlOut.subscribe(function(htmlOutput){
+        var emitter = require(emitterFile);
+        var worker = emitter.Elm.PrivateMain.init(null);
+        worker.ports.htmlOut.subscribe(function(htmlOutput){
 
             htmlOutput.map(function(group){
                 var outputFile = group[0];
@@ -230,7 +236,7 @@ compileProcess.on('exit',
                     if (isVerbose) console.log('Generated the following strings..');
                     console.log(html + "\n");
                 } else {
-                    if (isVerbose) console.log('Saving to', argv.output);
+                    if (isVerbose) console.log('Saving to', outputFile);
                     fs.writeFileSync(outputFile, html + "\n");
                 }
 

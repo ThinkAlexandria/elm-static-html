@@ -218,11 +218,28 @@ compileProcess.on('exit',
             //console.log('Trying to proceed anyway..');
         }
         var emitterFile = path.join(dirPath, 'emitter.js');
-        // Find and replace
+        // Find and replace our entry point
         var emitterFileContents = fs.readFileSync(emitterFile, 'utf-8');
         var fixedEmitterContents = emitterFileContents.replace(/'REPLACE_ME_WITH_JSON_STRINGIFY'/g, 'JSON.stringify(x)');
-        fs.writeFileSync(emitterFile, fixedEmitterContents);
+
+        // Disable the XSS protections provided by Elm runtime. We are
+        // generating static files from trusted content.
+        fixedEmitterContents = fixedEmitterContents.replace(/function _VirtualDom_noScript\(/g,
+            'function _VirtualDom_noScript(tag) { return tag }\nfunction _DISABLED_VirtualDom_noScript(');
+
+        fixedEmitterContents = fixedEmitterContents.replace(/function _VirtualDom_noOnOrFormAction\(/g,
+            'function _VirtualDom_noOnOrFormAction(key) { return key }\nfunction _DISABLED_VirtualDom_noOnOrFormAction(');
+
+        fixedEmitterContents = fixedEmitterContents.replace(/function _VirtualDom_noInnerHtmlOrFormAction\(/g,
+            'function _VirtualDom_noInnerHtmlOrFormAction(key) { return key }\nfunction _DISABLED_VirtualDom_noInnerHtmlOrFormAction(');
+
+        fixedEmitterContents = fixedEmitterContents.replace(/function _VirtualDom_noJavaScriptUri\(/g,
+            'function _VirtualDom_noJavaScriptUri(value) { return value }\nfunction _DISABLED_VirtualDom_noJavaScriptUri(');
+
+        fixedEmitterContents = fixedEmitterContents.replace(/function _VirtualDom_noJavaScriptOrHtmlUri\(/g,
+            'function _VirtualDom_noJavaScriptOrHtmlUri(value) { return value }\nfunction _DISABLED_VirtualDom_noJavaScriptOrHtmlUri(');
         
+        fs.writeFileSync(emitterFile, fixedEmitterContents);
 
         var emitter = require(emitterFile);
         var worker = emitter.Elm.PrivateMain.init(null);

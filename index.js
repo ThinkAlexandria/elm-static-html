@@ -125,7 +125,21 @@ var getModuleNames = function(config) {
     const moduleNames = Object.keys(config.files).map(function(filename){
         // load the file and try to read the module name by spliting
         var fileContents = fs.readFileSync(filename, 'utf-8');
-        var moduleName = fileContents.split('\n')[0].split(' ')[1].trim();
+        var moduleName = fileContents.split('\n');
+        if (moduleName.length === 0){
+            console.error("File is empty");
+            console.error('skipping ', filename)
+            return null;
+        }
+        
+        moduleName = moduleName[0].split(' ');
+        if (moduleName.length < 2 && moduleName[0] !== "module") {
+            console.error('Expected module name on first line of file!');
+            console.error('found', moduleName.join(' '));
+            return null;
+        }
+
+        moduleName = moduleName[1].trim();
 
         if (moduleName.length === 0){
             console.error('No module name provided!');

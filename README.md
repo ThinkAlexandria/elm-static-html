@@ -85,3 +85,5 @@ To generate multiple output files from a single elm file, supply an array of out
 ## Notes
 
 An .elm-static-html folder is created in order to generate the correct HTML and JS needed. You can delete it if you want, but it'll make builds a little slower.
+
+# Publishing

@@ -29,6 +29,8 @@ var argv = yargs
     .alias('c', 'config')
     .describe('c', 'Provide a json file for use as config')
 
+    .describe('minify
+
     .describe('init-config', 'Generate an example config.json')
 
     .argv;
@@ -63,6 +65,7 @@ const isVerbose = argv.verbose;
 const isInitConfig = (typeof argv.initConfig !== "undefined" && argv.initConfig);
 const outputToStdOut = (typeof argv.o === "undefined");
 const isUsingConfig = (typeof argv.c !== "undefined");
+const insertNewLines = (typeof argv.minify !== "undefined");
 
 if (isInitConfig){
     if (isVerbose) console.log('Initializing elm-static-html.json..');
@@ -206,7 +209,7 @@ var nativePath = path.join(dirPath, 'Native/Jsonify.js');
 // write things so we can run elm make
 fs.writeFileSync(elmPackagePath, JSON.stringify(elmPackage));
 
-var rendererFileContents = templates.generateRendererFile(moduleNames);
+var rendererFileContents = templates.generateRendererFile(moduleNames, insertNewLines);
 fs.writeFileSync(privateMainPath, rendererFileContents);
 
 // TODO replace the native file with a find and replace on the generated js
@@ -217,7 +220,7 @@ if (isVerbose) console.log('wrote template files to..', renderDirName);
 
 var options = {
     cwd: dirPath,
-    output: 'emitter.js'
+    output: 'emitter.cjs'
 };
 
 
@@ -231,7 +234,7 @@ compileProcess.on('exit',
             return;
             //console.log('Trying to proceed anyway..');
         }
-        var emitterFile = path.join(dirPath, 'emitter.js');
+        var emitterFile = path.join(dirPath, 'emitter.cjs');
         // Find and replace our entry point
         var emitterFileContents = fs.readFileSync(emitterFile, 'utf-8');
         var fixedEmitterContents = emitterFileContents.replace(/'REPLACE_ME_WITH_JSON_STRINGIFY'/g, 'JSON.stringify(x)');

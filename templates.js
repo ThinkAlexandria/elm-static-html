@@ -28,9 +28,15 @@ var viewFunctions = function(moduleNames){
 
 // this is our render's file contents
 // basically just boilerplate
-var generateRendererFile = function(moduleNames) {
+var generateRendererFile = function(moduleNames, insertNewLines) {
     var imports = importLines(moduleNames).join("\n");
     var views = viewFunctions(moduleNames).join(", ");
+
+    var newLines = "False";
+    if (insertNewLines) {
+        newLines = "True";
+    }
+    var indent = "4";
 
     var rendererFileContents = `
 port module PrivateMain exposing (..)
@@ -47,7 +53,7 @@ ${imports}
 asJsonString : Html msg -> String
 asJsonString x = "REPLACE_ME_WITH_JSON_STRINGIFY"
 
-options = { defaultFormatOptions | newLines = True, indent = 4 }
+options = { defaultFormatOptions | newLines = ${newLines}, indent = ${indent} }
 
 decode : (String, Html msg) -> ( String, String )
 decode (output, view) =

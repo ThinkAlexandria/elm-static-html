@@ -29,8 +29,6 @@ var argv = yargs
     .alias('c', 'config')
     .describe('c', 'Provide a json file for use as config')
 
-    .describe('minify
-
     .describe('init-config', 'Generate an example config.json')
 
     .argv;

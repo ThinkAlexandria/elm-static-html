@@ -242,7 +242,7 @@ compileProcess.on('exit',
           2
         );
         // console.log("Writing package.json to", packageJsonPath);
-        fs.writeFile(packageJsonPath, packageJsonContent);
+        fs.writeFileSync(packageJsonPath, packageJsonContent);
 
         var emitterFile = path.join(dirPath, 'emitter.js');
         // Find and replace our entry point

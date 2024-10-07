@@ -218,7 +218,7 @@ if (isVerbose) console.log('wrote template files to..', renderDirName);
 
 var options = {
     cwd: dirPath,
-    output: 'emitter.cjs'
+    output: 'emitter.js'
 };
 
 
@@ -232,7 +232,19 @@ compileProcess.on('exit',
             return;
             //console.log('Trying to proceed anyway..');
         }
-        var emitterFile = path.join(dirPath, 'emitter.cjs');
+
+        const packageJsonPath = path.join(dirPath, "package.json");
+        const packageJsonContent = JSON.stringify(
+          {
+            type: "commonjs",
+          },
+          null,
+          2
+        );
+        // console.log("Writing package.json to", packageJsonPath);
+        fs.writeFile(packageJsonPath, packageJsonContent);
+
+        var emitterFile = path.join(dirPath, 'emitter.js');
         // Find and replace our entry point
         var emitterFileContents = fs.readFileSync(emitterFile, 'utf-8');
         var fixedEmitterContents = emitterFileContents.replace(/'REPLACE_ME_WITH_JSON_STRINGIFY'/g, 'JSON.stringify(x)');
